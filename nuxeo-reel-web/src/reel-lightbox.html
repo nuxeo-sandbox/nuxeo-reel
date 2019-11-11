@@ -1,0 +1,167 @@
+<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="reel-lightbox">
+  <template>
+    <style include="paper-dialog-shared-styles iron-flex iron-flex-alignment">
+      :host {
+        background-color: rgba(0, 0, 0, 0.7) !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+      }
+
+      .container {
+        width: 100vw;
+        height: 100vh;
+        margin: auto;
+      }
+
+      iron-icon {
+        width: 64px;
+        height: 64px;
+        --iron-icon-fill-color: #fff;
+      }
+
+      .close {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+      }
+
+      .previewContainer {
+        height: 100%;
+      }
+
+      .iframeContainer {
+        height: 100%;
+        width: 100%;
+        background-color: #111;
+      }
+
+      nuxeo-document-preview {
+        height: 100%;
+        width: 100%;
+        border-width: 0px;
+      }
+
+      .innerBox {
+        height: 100%;
+      }
+
+      .verticalCenter {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .properties {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        padding: 16px;
+        background-color: #fff;
+      }
+    </style>
+
+    <div class="container">
+      <iron-icon icon="icons:close" class="close" on-tap="_close"></iron-icon>
+      <div class="layout horizontal innerBox">
+        <div class="verticalCenter">
+          <iron-icon icon="icons:chevron-left" on-tap="_previous"></iron-icon>
+        </div>
+        <div class="previewContainer flex">
+          <div class="layout vertical iframeContainer">
+            <div class="flex">
+              <nuxeo-document-preview document="[[item]]"></nuxeo-document-preview>
+            </div>
+          </div>
+        </div>
+        <div class="verticalCenter">
+          <iron-icon icon="icons:chevron-right" on-tap="_next"></iron-icon>
+        </div>
+      </div>
+    </div>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'reel-lightbox',
+
+    behaviors: [Polymer.PaperDialogBehavior, Polymer.NeonAnimationRunnerBehavior],
+
+    listeners: { 'neon-animation-finish': '_onNeonAnimationFinish' },
+    _renderOpened: function () {
+      this.cancelAnimation();
+      this.playAnimation('entry');
+    },
+
+    properties: {
+
+      items: {
+        type: Array
+      },
+
+      index: {
+        type: Number
+      },
+
+      item: {
+        type: Object,
+        computed: "_computeItem(items,index)"
+      }
+    },
+
+    _renderClosed: function () {
+      this.cancelAnimation();
+      this.playAnimation('exit');
+    },
+
+    _onNeonAnimationFinish: function () {
+      if (this.opened) {
+        this._finishRenderOpened();
+      } else {
+        this._finishRenderClosed();
+      }
+    },
+
+    _computeItem: function (items, index) {
+      if (items && items.length > 0 && index < items.length) {
+        return items[index];
+      } else {
+        return undefined;
+      }
+    },
+
+    _hasPrevious: function (index) {
+      return index > 0;
+    },
+
+    _previous: function () {
+      if (this._hasPrevious(this.index)) {
+        this.index--;
+      }
+    },
+
+    _hasNext: function (items, index) {
+      return items && this.items.length > 0 && index < (items.length - 1);
+    },
+
+    _next: function () {
+      if (this._hasNext(this.items, this.index)) {
+        this.index++;
+      }
+    },
+
+    _close: function () {
+      this.toggle();
+    },
+
+    _getPositionLabel: function (index) {
+      return `${index + 1} / ${this.items.length}`
+    }
+
+  });
+</script>

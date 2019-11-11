@@ -1,0 +1,187 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/nuxeo-elements/nuxeo-connection.html">
+<link rel="import" href="../bower_components/nuxeo-elements/nuxeo-document.html">
+<link rel="import" href="../bower_components/nuxeo-elements/nuxeo-page-provider.html">
+<link rel="import" href="../bower_components/nuxeo-ui-elements\nuxeo-document-preview.html">
+<link rel="import" href="reel-lightbox.html">
+
+
+<dom-module id="reel-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+        display: block;
+      }
+
+      .main {
+        width: 100%;
+        height: 100%;
+      }
+
+      .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom:16px;
+      }
+
+      .content {
+        height: calc(100vh - 146px);
+      }
+
+      iron-list {
+        height: 100%;
+      }
+
+      .assetContainer {}
+
+      .asset {
+        @apply --layout;
+        background-color: #ddd;
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 8px;
+      }
+
+      .asset:hover .detail {
+        opacity: 1;
+      }
+
+      .asset>iron-image {
+        @apply --layout-flex;
+      }
+
+      .asset>.detail {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+        color: white;
+        font-size: 20px;
+        font-weight: 100;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.1s;
+      }
+    </style>
+
+    <nuxeo-connection url="/nuxeo"></nuxeo-connection>
+
+    <nuxeo-document auto doc-id="[[routeData.reelId]]" response="{{presentation}}" schemas="*"></nuxeo-document>
+
+    <app-location route="{{route}}" url-space-regex="^[[rootPath]]" use-hash-as-path></app-location>
+
+    <app-route route="{{route}}" pattern=":reelId" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+    <nuxeo-page-provider id="nxProvider" auto provider="advanced_document_content" page-size="40" aggregations="{{aggregations}}" enrichers="thumbnail, permissions" params="[[searchParams]]" schemas="dublincore,file,picture,video"
+      headers="[[headers]]" fetch-aggregates current-page="{{assets}}">
+    </nuxeo-page-provider>
+
+    <reel-lightbox id="lightbox" with-backdrop items="[[assets]]"></reel-lightbox>
+
+    <div class="main" style$="[[_getStyles(presentation)]]">
+      <div class="header">
+        <iron-image src="[[_getLogo(presentation)]]"></iron-image>
+        <div>[[presentation.title]]</div>
+      </div>
+      <div class="content">
+        <iron-list items="[[assets]]" grid>
+          <template>
+            <div class="assetContainer" on-tap="_openLightbox">
+              <div class="asset">
+                <iron-image sizing="cover" src="[[item.contextParameters.thumbnail.url]]"></iron-image>
+                <div class="detail">[[item.title]]</div>
+              </div>
+            </div>
+          </template>
+        </iron-list>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    class ReelApp extends Polymer.Element {
+      static get is() {
+        return 'reel-app';
+      }
+
+      static get properties() {
+        return {
+          rootPath: String,
+          routeData: Object,
+          subroute: String,
+          presentation: Object,
+          searchParams: {
+            type: String,
+            computed: '_computeSearchParams(routeData.reelId)'
+          }
+        };
+      }
+
+      static get observers() {
+        return [
+          '_reelIdChanged(routeData.reelId)',
+        ];
+      }
+
+      _reelIdChanged(reelId) {
+        console.log("change");
+      }
+
+      _computeSearchParams(reelId) {
+        return {
+          ecm_parentId: reelId,
+          ecm_trashed: false
+        };
+      }
+
+      _getLogo(presentation) {
+        if (!presentation) {
+          return "";
+        }
+        return presentation.properties["presentation:logo"].data;
+      }
+
+      _getStyles(presentation) {
+        if (!presentation) {
+          return "";
+        }
+        let background = presentation.properties["presentation:background"].data;
+        let color = presentation.properties["presentation:color"]
+        return `background-image: url("${background}");color: ${color}`;
+      }
+
+      _openLightbox(e) {
+        this.$.lightbox.index = e.model.index;
+        this.$.lightbox.toggle();
+      }
+
+    }
+
+    window.customElements.define(ReelApp.is, ReelApp);
+  </script>
+</dom-module>

@@ -1,0 +1,26 @@
+{
+  "name": "reel",
+  "devDependencies": {
+    "cpr": "^2.0.2",
+    "eslint": "^3.19.0",
+    "eslint-config-google": "^0.7.1",
+    "eslint-plugin-html": "^2.0.0",
+    "mkdirp": "^0.5.1",
+    "polymer-cli": "1.6.0",
+    "rimraf": "^2.5.4"
+  },
+  "scripts": {
+    "lint": "npm run lint:javascript && polymer lint",
+    "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
+    "polint": "polymer lint",
+    "test": "polymer test",
+    "test:integration": "polymer build # test that psk builds without error with the CLI",
+    "clean": "rimraf build target",
+    "prebuild": "npm run clean",
+    "build": "polymer build",
+    "postbuild": "npm run nuxeo",
+    "prenuxeo": "mkdirp target/classes/nuxeo.war/reel",
+    "nuxeo": "cpr build/es5-bundled/ target/classes/nuxeo.war/reel -o && cpr nuxeo/ target/classes/ -o",
+    "serve": "polymer serve --port 3000 --proxy-path nuxeo/api --proxy-target http://localhost:8080/nuxeo/api"
+  }
+}

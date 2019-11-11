@@ -1,0 +1,18 @@
+<component name="org.nuxeo.labs.reel.authentication.polymer.reel">
+
+  <extension point="startURL" target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService">
+    <startURLPattern>
+      <patterns>
+        <pattern>reel/</pattern>
+      </patterns>
+    </startURLPattern>
+  </extension>
+
+  <!-- Uncomment this to allow browsing application without authentication
+  <extension point="openUrl" target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService">
+    <openUrl name="reel">
+      <grantPattern>reel</grantPattern>
+    </openUrl>
+  </extension>
+  -->
+</component>
