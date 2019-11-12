@@ -1,26 +1,14 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
-<link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
-<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/nuxeo-elements/nuxeo-connection.html">
 <link rel="import" href="../bower_components/nuxeo-elements/nuxeo-document.html">
 <link rel="import" href="../bower_components/nuxeo-elements/nuxeo-page-provider.html">
-<link rel="import" href="../bower_components/nuxeo-ui-elements\nuxeo-document-preview.html">
 <link rel="import" href="reel-lightbox.html">
 
 
@@ -46,8 +34,12 @@
         margin-bottom:16px;
       }
 
+      .logo {
+        height:64px;
+      }
+
       .content {
-        height: calc(100vh - 146px);
+        height: calc(100vh - 104px);
       }
 
       iron-list {
@@ -61,7 +53,7 @@
         background-color: #ddd;
         position: relative;
         width: 300px;
-        height: 300px;
+        height: 200px;
         margin: 8px;
       }
 
@@ -94,7 +86,7 @@
 
     <app-location route="{{route}}" url-space-regex="^[[rootPath]]" use-hash-as-path></app-location>
 
-    <app-route route="{{route}}" pattern=":reelId" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <app-route route="{{route}}" pattern="/:reelId" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
     <nuxeo-page-provider id="nxProvider" auto provider="advanced_document_content" page-size="40" aggregations="{{aggregations}}" enrichers="thumbnail, permissions" params="[[searchParams]]" schemas="dublincore,file,picture,video"
       headers="[[headers]]" fetch-aggregates current-page="{{assets}}">
@@ -104,7 +96,7 @@
 
     <div class="main" style$="[[_getStyles(presentation)]]">
       <div class="header">
-        <iron-image src="[[_getLogo(presentation)]]"></iron-image>
+        <img src="[[_getLogo(presentation)]]" class="logo" />
         <div>[[presentation.title]]</div>
       </div>
       <div class="content">
@@ -170,9 +162,11 @@
         if (!presentation) {
           return "";
         }
-        let background = presentation.properties["presentation:background"].data;
-        let color = presentation.properties["presentation:color"]
-        return `background-image: url("${background}");color: ${color}`;
+
+        let backgroundImage = presentation.properties["presentation:backgroundImage"] ? presentation.properties["presentation:backgroundImage"].data : "";
+        let backgroundColor = presentation.properties["presentation:backgroundColor"] ? presentation.properties["presentation:backgroundColor"].data : "#fff";
+        let color = presentation.properties["presentation:color"] ? presentation.properties["presentation:color"] : '#000';
+        return `background-image: url("${backgroundImage}");background-color: ${backgroundColor};color: ${color}`;
       }
 
       _openLightbox(e) {

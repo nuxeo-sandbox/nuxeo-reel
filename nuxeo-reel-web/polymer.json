@@ -1,9 +1,7 @@
 {
   "entrypoint": "index.html",
   "shell": "src/reel-app.html",
-  "fragments": [
-    "src/reel-lightbox.html"
-  ],
+  "fragments": [],
   "sources": [
     "src/**/*",
     "images/**/*"
