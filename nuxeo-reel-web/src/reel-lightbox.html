@@ -2,6 +2,9 @@
 <link rel="import" href="../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/nuxeo-ui-elements/nuxeo-document-preview.html">
+<link rel="import" href="reel-video-viewer.html">
 
 <dom-module id="reel-lightbox">
   <template>
@@ -40,7 +43,7 @@
         background-color: #111;
       }
 
-      nuxeo-document-preview {
+      nuxeo-document-preview, reel-video-viewer {
         height: 100%;
         width: 100%;
         border-width: 0px;
@@ -73,7 +76,12 @@
         <div class="previewContainer flex">
           <div class="layout vertical iframeContainer">
             <div class="flex">
-              <nuxeo-document-preview document="[[item]]"></nuxeo-document-preview>
+              <template is="dom-if"  if="[[_isVideo(item)]]" restamp>
+                <reel-video-viewer id="video "controls sources="[[_computeVideoSources(item)]]"></reel-video-viewer>
+              </template>
+              <template is="dom-if" if="[[!_isVideo(item)]]" restamp>
+                <nuxeo-document-preview document="[[item]]"></nuxeo-document-preview>
+              </template>
             </div>
           </div>
         </div>
@@ -161,6 +169,25 @@
 
     _getPositionLabel: function (index) {
       return `${index + 1} / ${this.items.length}`
+    },
+
+    _isVideo: function(item) {
+      return item && item.facets && item.facets.indexOf("Video") > 0;
+    },
+
+    _computeVideoSources: function(item) {
+      if (item && item.properties && item.properties['vid:transcodedVideos']) {
+        const conversions = [];
+        item.properties['vid:transcodedVideos'].forEach((conversion) => {
+          if (conversion && conversion.content && conversion.content.data && conversion.content['mime-type']) {
+            conversions.push({
+              data: conversion.content.data,
+              type: conversion.content['mime-type'],
+            });
+          }
+        });
+        return conversions;
+      }
     }
 
   });
