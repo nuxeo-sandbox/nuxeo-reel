@@ -31,7 +31,8 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-bottom:16px;
+        padding-bottom:16px;
+        padding-top:16px;
       }
 
       .logo {
@@ -39,7 +40,7 @@
       }
 
       .content {
-        height: calc(100vh - 104px);
+        height: calc(100vh - 120px);
       }
 
       iron-list {
@@ -164,7 +165,7 @@
         }
 
         let backgroundImage = presentation.properties["presentation:backgroundImage"] ? presentation.properties["presentation:backgroundImage"].data : "";
-        let backgroundColor = presentation.properties["presentation:backgroundColor"] ? presentation.properties["presentation:backgroundColor"].data : "#fff";
+        let backgroundColor = presentation.properties["presentation:backgroundColor"] ? presentation.properties["presentation:backgroundColor"] : "#fff";
         let color = presentation.properties["presentation:color"] ? presentation.properties["presentation:color"] : '#000';
         return `background-image: url("${backgroundImage}");background-color: ${backgroundColor};color: ${color}`;
       }
