@@ -77,7 +77,8 @@
           <div class="layout vertical iframeContainer">
             <div class="flex">
               <template is="dom-if"  if="[[_isVideo(item)]]" restamp>
-                <reel-video-viewer id="video "controls sources="[[_computeVideoSources(item)]]"></reel-video-viewer>
+                <reel-video-viewer id="video "controls sources="[[_computeVideoSources(item)]]"
+                                   poster="[[_getPoster(item)]]"></reel-video-viewer>
               </template>
               <template is="dom-if" if="[[!_isVideo(item)]]" restamp>
                 <nuxeo-document-preview document="[[item]]"></nuxeo-document-preview>
@@ -177,8 +178,18 @@
 
     _computeVideoSources: function(item) {
       if (item && item.properties && item.properties['vid:transcodedVideos']) {
+
+        var transcoded = item.properties['vid:transcodedVideos'];
+        transcoded = transcoded.sort(function(a,b) {
+          if (a.info.height<b.info.height) {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+
         const conversions = [];
-        item.properties['vid:transcodedVideos'].forEach((conversion) => {
+        transcoded.forEach((conversion) => {
           if (conversion && conversion.content && conversion.content.data && conversion.content['mime-type']) {
             conversions.push({
               data: conversion.content.data,
@@ -188,6 +199,17 @@
         });
         return conversions;
       }
+    },
+
+    _getPoster: function(item) {
+      if (!item) {
+        return false;
+      }
+      var views = item.properties['picture:views'];
+      if (views === undefined || views.length === views || views.length === 0 ) {
+        return false;
+      }
+      return views[1].content.data;
     }
 
   });

@@ -86,7 +86,11 @@ limitations under the License.
             /**
              * The `sources` to be displayed.
              */
-            sources: Object,
+            sources: {
+              type: Object,
+              observer: '_onSourcesChanged'
+            }
+
           };
         }
 
@@ -105,6 +109,10 @@ limitations under the License.
 
         isPaused() {
           return this.$.video.paused;
+        }
+
+        _onSourcesChanged(sources) {
+          this.$.video.load();
         }
 
       }
