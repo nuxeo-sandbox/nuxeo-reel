@@ -68,7 +68,7 @@
     </style>
 
     <div class="container">
-      <iron-icon icon="icons:close" class="close" on-tap="_close"></iron-icon>
+      <iron-icon icon="icons:close" class="close" dialog-dismiss on-tap="_close"></iron-icon>
       <div class="layout horizontal innerBox">
         <div class="verticalCenter">
           <iron-icon icon="icons:chevron-left" on-tap="_previous"></iron-icon>
@@ -77,7 +77,7 @@
           <div class="layout vertical iframeContainer">
             <div class="flex">
               <template is="dom-if"  if="[[_isVideo(item)]]" restamp>
-                <reel-video-viewer id="video "controls sources="[[_computeVideoSources(item)]]"
+                <reel-video-viewer controls sources="[[_computeVideoSources(item)]]"
                                    poster="[[_getPoster(item)]]"></reel-video-viewer>
               </template>
               <template is="dom-if" if="[[!_isVideo(item)]]" restamp>
@@ -165,6 +165,10 @@
     },
 
     _close: function () {
+      var videoPlayer = this.shadowRoot.querySelector('reel-video-viewer');
+      if (videoPlayer) {
+        videoPlayer.stop();
+      }
       this.toggle();
     },
 
