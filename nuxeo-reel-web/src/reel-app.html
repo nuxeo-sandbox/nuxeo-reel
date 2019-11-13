@@ -138,11 +138,18 @@
       static get observers() {
         return [
           '_reelIdChanged(routeData.reelId)',
+          '_presentationChanged(presentation)'
         ];
       }
 
       _reelIdChanged(reelId) {
         console.log("change");
+      }
+
+      _presentationChanged(presentation) {
+        if (presentation) {
+          window.document.title = presentation.title;
+        }
       }
 
       _computeSearchParams(reelId) {
